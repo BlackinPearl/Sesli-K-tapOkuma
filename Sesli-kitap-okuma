@@ -1,0 +1,48 @@
+import tkinter as tk 
+import PyPDF2                #pdf dosyalarından metni çıkartan fonksiyon
+from gtts import gTTS                  #metni sese dönüştüren google apı'si
+import os                      #sistem komutlarını çalıstırmak için pythondaki kütüphane
+from tkinter import filedialog
+#pdf dosyasındaki yazılara metne cevirme fonksiyonu
+def metni_cıkart(pdf_yolu):           #burdaki 'pdf_yolu' dosya sec alanını temsil eder yani dısardan veriyi,yolu alcak
+    metin=""                             #byrda metin dedik ve içini bos bıraktık çünkü pdf ten cıkarttıgımız alan buraya yazılsın diye.
+    pdf_okuyucu=PyPDF2.PdfReader(open(pdf_yolu,'rb'))     #'rb' yi yazmamaızın sebebi rea ,binary yani hem metinleri hemde resimler varsa onların üstündeki yazılarıda okur
+    for sayfa_num in range(len(pdf_okuyucu.pages)):
+        metin+=pdf_okuyucu.pages[sayfa_num].extract_text()
+    return metin   # burdaki 'return metin ' ifadesi metni fonksiyonun dısına cıkarır ve dış dünyadada yani baska fonksiyonlardada kullanmamızı sağlar
+
+#metni sesli hale getiren fonksiyon 
+
+def metni_sese_cevir(metin,cıktı_dosyası):
+
+    sese_cevirici=gTTS(text=metin,lang="tr")
+    sese_cevirici.save(cıktı_dosyası)
+    
+#dosya secme fonksiyonu
+
+def dosya_sec():
+
+    dosya_yolu=filedialog.askopenfilename(filetypes=[("pdf dosyaları","*.pdf")])
+    if dosya_yolu:
+        metne_cevir=metni_cıkart(dosya_yolu)
+        metni_sese_cevir(metne_cevir,"kaydet.mp3")
+        os.system("start kaydet.mp3")
+
+app=tk.Tk()
+app.title("Sesli kitap uygulaması")
+app.geometry("250x250")
+
+
+secım_butonu=tk.Button(app,text="PDF SEÇ",command=dosya_sec,padx=20,pady=20)
+
+secım_butonu.pack(pady=20)
+
+
+
+
+
+
+
+
+
+app.mainloop()
